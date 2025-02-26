@@ -1,0 +1,29 @@
+﻿version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver_container
+    environment:
+      SA_PASSWORD: "Password1234"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    networks:
+      - backend_network
+
+  webapi:
+    build: .
+    container_name: webapi_container
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TaskDatabase;User Id=sa;Password=Password1234;
+    ports:
+      - "5958:5000"
+    networks:
+      - backend_network
+
+networks:
+  backend_network:
+    driver: bridge
