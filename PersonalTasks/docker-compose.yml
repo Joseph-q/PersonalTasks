@@ -18,7 +18,7 @@ services:
     depends_on:
       - sqlserver
     environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TaskDatabase;User Id=sa;Password=Password1234;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TasksDatabase;User Id=sa;Password=Password1234;TrustServerCertificate=True;
     ports:
       - "5958:5000"
     networks:

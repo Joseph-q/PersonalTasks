@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using PersonalTasks.Auth.Controller.DTOs.Request;
 using PersonalTasks.Auth.Services;
 using PersonalTasks.Models;
@@ -10,14 +11,25 @@ namespace PersonalTasks.Auth.Controller
     [Route("api/auth")]
     [Produces("application/json")]
     [ProducesResponseType(401)]
-    public class AuthController(IAuthService authService) : ControllerBase
+    public class AuthController(IAuthService authService, IMapper mapper) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
+        private readonly IMapper _mapper = mapper;
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] CreateUserRequest user)
         {
-            await _authService.RegisterUser(user);
+            User? exist = await _authService.GetUserWithPasswordByUsername(user.Username);
+
+            if (exist != null)
+            {
+                return BadRequest("User already exist");
+            }
+
+            var userToCreate = _mapper.Map<User>(user);
+
+            await _authService.RegisterUser(userToCreate);
+
             return Ok();
         }
         [HttpPost("login")]
@@ -35,7 +47,7 @@ namespace PersonalTasks.Auth.Controller
                 return Unauthorized();
             }
 
-            string token = await _authService.GenerateJWT(userWithPassword);
+            string token = _authService.GenerateJWT(userWithPassword);
             return Ok(token);
         }
     }
