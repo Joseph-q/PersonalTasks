@@ -23,8 +23,8 @@ namespace PersonalTasks
             CreateMap<UpdateTaskRequest, TaskItem>()
                 .ForMember(d => d.UpdatedAt, o => o.MapFrom(s => DateOnly.FromDateTime(DateTime.Now)))
                 .ForMember(d => d.Completed, o => o.MapFrom(s => s.IsCompleted ?? false))
-                .ForMember(d => d.Title, o => o.MapFrom((s, d) => string.IsNullOrEmpty(s.Title) ? s.Title : d.Title)) // If the title is null or empty, it will keep the original title
-                .ForMember(d => d.Description, o => o.MapFrom((s, d) => string.IsNullOrEmpty(s.Description) ? s.Description : d.Description)); // If the description is null or empty, it will keep the original description
+                .ForMember(d => d.Title, o => o.MapFrom((s, d) => string.IsNullOrEmpty(s.Title) ? d.Title : s.Title)) // If the title is null or empty, it will keep the original title
+                .ForMember(d => d.Description, o => o.MapFrom((s, d) => string.IsNullOrEmpty(s.Description) ? d.Description : s.Description)); // If the description is null or empty, it will keep the original description
             ;
 
             //Task mapping

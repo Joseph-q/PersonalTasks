@@ -5,7 +5,7 @@ using PersonalTasks.Models;
 using PersonalTasks.Tasks.Controller.DTOs.Request;
 using PersonalTasks.Tasks.Controller.DTOs.Response;
 using PersonalTasks.Tasks.Sevices;
-using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace PersonalTasks.Tasks.Controller
 {
@@ -22,19 +22,17 @@ namespace PersonalTasks.Tasks.Controller
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTask(int id)
         {
-            var user = HttpContext.User;
-            var userId = user.FindFirst(JwtRegisteredClaimNames.Sub);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            if (!userId.Value.Equals(id.ToString()))
-            {
-                return Unauthorized();
-            }
+            int parsedUserId = int.Parse(userId);
 
-            TaskItem? taskItem = await _taskService.GetTask(id);
+
+            TaskItem? taskItem = await _taskService.GetUserTask(id, parsedUserId);
             if (taskItem == null)
             {
                 return NotFound();
@@ -47,14 +45,15 @@ namespace PersonalTasks.Tasks.Controller
         [HttpGet]
         public async Task<IActionResult> GetTasks([FromQuery] GetTasksQueryParams queryParams)
         {
-            var user = HttpContext.User;
-            var userId = user.FindFirst(JwtRegisteredClaimNames.Sub);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            queryParams.UserId = int.Parse(userId.Value);
+            queryParams.UserId = int.Parse(userId);
 
             if (queryParams.UserId == 0)
             {
@@ -69,8 +68,9 @@ namespace PersonalTasks.Tasks.Controller
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskRequest taskRequest)
         {
-            var user = HttpContext.User;
-            var userId = user.FindFirst(JwtRegisteredClaimNames.Sub);
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
 
             if (userId == null)
             {
@@ -78,7 +78,7 @@ namespace PersonalTasks.Tasks.Controller
             }
 
             TaskItem taskItem = _mapper.Map<TaskItem>(taskRequest);
-            taskItem.UserId = int.Parse(userId.Value);
+            taskItem.UserId = int.Parse(userId);
 
 
             await _taskService.CreateTask(taskItem);
@@ -89,22 +89,26 @@ namespace PersonalTasks.Tasks.Controller
         public async Task<IActionResult> UpdateTask(int id, [FromBody] UpdateTaskRequest taskRequest)
         {
 
-            var user = HttpContext.User;
-            var userId = user.FindFirst(JwtRegisteredClaimNames.Sub);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
 
             if (userId == null)
             {
                 return Unauthorized();
             }
-
-            int parsedUserId = int.Parse(userId.Value);
+            int parsedUserId = int.Parse(userId);
 
             TaskItem? taskItem = await _taskService.GetUserTask(id, parsedUserId);
+
+
             if (taskItem == null)
             {
                 return NotFound();
             }
             _mapper.Map(taskRequest, taskItem);
+
+
+
             await _taskService.UpdateTask(taskItem);
             return NoContent();
         }
@@ -113,15 +117,14 @@ namespace PersonalTasks.Tasks.Controller
         public async Task<IActionResult> DeleteTask(int id)
         {
 
-            var user = HttpContext.User;
-            var userId = user.FindFirst(JwtRegisteredClaimNames.Sub);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
 
             if (userId == null)
             {
                 return Unauthorized();
             }
-
-            int parsedUserId = int.Parse(userId.Value);
+            int parsedUserId = int.Parse(userId);
 
             TaskItem? taskItem = await _taskService.GetUserTask(id, parsedUserId);
             if (taskItem == null)

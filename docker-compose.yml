@@ -13,7 +13,9 @@ services:
       - backend_network
 
   webapi:
-    build: .
+    build: 
+      context: .
+      dockerfile: PersonalTasks/Dockerfile
     container_name: webapi_container
     depends_on:
       - sqlserver
