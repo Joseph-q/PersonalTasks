@@ -10,5 +10,7 @@ namespace PersonalTasks.Tasks.Sevices
         Task<List<TaskItem>> GetUserTasks(GetTasksQueryParams queryParams);
         Task UpdateTask(TaskItem taskItem);
         Task DeleteTask(TaskItem taskItem);
+
+        Task<TaskItem?> GetUserTask(int taskId, int userId);
     }
 }

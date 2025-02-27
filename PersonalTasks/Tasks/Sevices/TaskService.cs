@@ -26,6 +26,11 @@ namespace PersonalTasks.Tasks.Sevices
             return _context.TaskItems.FirstOrDefaultAsync(t => t.Id == id);
         }
 
+        public Task<TaskItem?> GetUserTask(int taskId, int userId)
+        {
+            return _context.TaskItems.FirstOrDefaultAsync(t => t.Id == taskId && t.UserId.Equals(userId));
+        }
+
         public Task<List<TaskItem>> GetUserTasks(GetTasksQueryParams queryParams)
         {
             var chain = _context.TaskItems.AsQueryable();
@@ -53,7 +58,8 @@ namespace PersonalTasks.Tasks.Sevices
 
         public Task UpdateTask(TaskItem taskItem)
         {
-            throw new NotImplementedException();
+            _context.TaskItems.Update(taskItem);
+            return _context.SaveChangesAsync();
         }
     }
 }
