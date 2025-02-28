@@ -14,9 +14,30 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 
+var policyCors = "AllowAll";
+
+//CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(policyCors, policy =>
+    {
+        policy.AllowAnyOrigin()   // Permite solicitudes desde cualquier origen
+              .AllowAnyMethod()   // Permite cualquier método (GET, POST, PUT, DELETE, etc.)
+              .AllowAnyHeader();  // Permite cualquier cabecera
+    });
+});
 // DATABASE
+string? connString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+
+if (string.IsNullOrEmpty(connString))
+{
+    throw new Exception("Connection string not found");
+}
+
+
 builder.Services.AddDbContext<ContextDb>(op => op
-    .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .UseSqlServer(connString)
     .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
 // DI SERVICES
@@ -95,19 +116,18 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-
-
-// Configure the HTTP request pipeline.
+// Configura el pipeline de la aplicación
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+app.UseCors(policyCors);
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

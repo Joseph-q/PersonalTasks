@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PersonalTasks.Models;
 
@@ -11,6 +13,20 @@ public partial class ContextDb : DbContext
     public ContextDb(DbContextOptions<ContextDb> options, IConfiguration configuration)
         : base(options)
     {
+        try
+        {
+            var databaseCreate = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
+
+            if (databaseCreate != null)
+            {
+                if (!databaseCreate.CanConnect()) databaseCreate.Create();
+                if (!databaseCreate.HasTables()) databaseCreate.CreateTables();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     public virtual DbSet<TaskItem> TaskItems { get; set; }

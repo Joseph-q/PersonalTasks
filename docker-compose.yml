@@ -1,31 +1,35 @@
-﻿version: '3.8'
+networks:
+  backend_taskApp:
+    driver: bridge
+
 
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sqlserver_container
-    environment:
-      SA_PASSWORD: "Password1234"
-      ACCEPT_EULA: "Y"
+  taskDb:
+    container_name: personaltasks-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Password1234"
     networks:
-      - backend_network
+        - backend_taskApp
 
-  webapi:
-    build: 
+
+  personaltasks:
+    container_name: personaltasks-webapi
+    image: ${DOCKER_REGISTRY-}personaltasks
+    build:
       context: .
       dockerfile: PersonalTasks/Dockerfile
-    container_name: webapi_container
-    depends_on:
-      - sqlserver
-    environment:
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=TasksDatabase;User Id=sa;Password=Password1234;TrustServerCertificate=True;
     ports:
-      - "5958:5000"
+        - "5000:8081"
+    depends_on:
+      - taskDb
+    environment:
+     - DB_HOST=taskDb
+     - DB_NAME=TasksDatabase
+     - DB_PASSWORD=Password1234 
+     - DB_CONNECTION_STRING=Server=taskDb;Database=TasksDatabase;User Id=sa;Password=Password1234;TrustServerCertificate=True
     networks:
-      - backend_network
-
-networks:
-  backend_network:
-    driver: bridge
+      - backend_taskApp

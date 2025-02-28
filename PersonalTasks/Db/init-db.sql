@@ -1,3 +1,5 @@
+CREATE DATABASE TasksDatabase;
+
 use TasksDatabase;
 
 Create Table task (
@@ -7,6 +9,8 @@ Create Table task (
 	completed BIT NOT NULL DEFAULT 0,
 	created_at DATE NOT NULL DEFAULT GETDATE(),
 	updated_at DATE,
+	user_id INT, -- Nueva columna que referencia al id de usuario
+    FOREIGN KEY (user_id) REFERENCES users(id) -- Definir la FK que hace referencia a la tabla 'users'
 );
 
 

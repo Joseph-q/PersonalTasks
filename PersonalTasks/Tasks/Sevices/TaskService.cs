@@ -50,9 +50,9 @@ namespace PersonalTasks.Tasks.Sevices
                 chain = chain.Where(t => t.UpdatedAt == queryParams.UpdatedAt);
             }
 
+            chain = chain.OrderByDescending(t => t.CreatedAt);
 
             return chain.Where(t => t.UserId == queryParams.UserId).ToListAsync();
-
 
         }
 
