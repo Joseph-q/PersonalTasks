@@ -1,0 +1,10 @@
+﻿Server: task-server-database.database.windows.net
+Admin: josephAdminUser
+password: ArrGIPLOPhasTableNam@123123@1278371873
+
+
+
+
+     - DB_CONNECTION_STRING=Server=tcp:task-server-database.database.windows.net,1433;Initial Catalog=taskDb;Persist Security Info=False;User ID=josephAdminUser;Password=234837kfaj%2A%2A%C2%A8%5D%22%5B%C4%84SDF%5D%2A%2A;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+
+Server=tcp:task-server-database.database.windows.net,1433;Initial Catalog=taskDb;Persist Security Info=False;User ID=josephAdminUser;Password=234837kfaj**¨]"#[ÄSDF][**]";MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication="Active Directory Password";

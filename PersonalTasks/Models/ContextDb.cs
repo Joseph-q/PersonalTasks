@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PersonalTasks.Models;
 
@@ -15,17 +13,11 @@ public partial class ContextDb : DbContext
     {
         try
         {
-            var databaseCreate = Database.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
-
-            if (databaseCreate != null)
-            {
-                if (!databaseCreate.CanConnect()) databaseCreate.Create();
-                if (!databaseCreate.HasTables()) databaseCreate.CreateTables();
-            }
+            Database.EnsureCreated();
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine("Error creando base de datos", ex.Message);
         }
     }
 

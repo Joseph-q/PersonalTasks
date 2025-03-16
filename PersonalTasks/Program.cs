@@ -14,6 +14,15 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 
+//// HTTPS
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.Listen(IPAddress.Any, 443, listenOptions =>
+//    {
+//        listenOptions.UseHttps("/path/to/certificate.pfx", "your-certificate-password"); // Asegúrate de tener un certificado configurado
+//    });
+//});
+
 var policyCors = "AllowAll";
 
 //CORS

@@ -13,7 +13,6 @@ namespace PersonalTasks.Tasks.Controller
     [ApiController]
     [Route("api/tasks")]
     [Produces("application/json")]
-    [ProducesResponseType(401)]
     public class TaskController(ITaskService taskService, IMapper mapper) : ControllerBase
     {
         private readonly ITaskService _taskService = taskService;
@@ -32,11 +31,12 @@ namespace PersonalTasks.Tasks.Controller
             int parsedUserId = int.Parse(userId);
 
 
-            TaskItem? taskItem = await _taskService.GetUserTask(id, parsedUserId);
+            TaskItem? taskItem = await _taskService.GetTaskAsync(id, parsedUserId);
             if (taskItem == null)
             {
                 return NotFound();
             }
+
             TaskResponse res = _mapper.Map<TaskResponse>(taskItem);
 
             return Ok(res);
@@ -52,17 +52,12 @@ namespace PersonalTasks.Tasks.Controller
             {
                 return Unauthorized();
             }
+            int parsedUserId = int.Parse(userId);
 
-            queryParams.UserId = int.Parse(userId);
 
-            if (queryParams.UserId == 0)
-            {
-                return BadRequest("UserId is required.");
-            }
+            List<TaskResponse> taskItems = await _taskService.GetListTaskResponseAsync(queryParams, parsedUserId);
 
-            IEnumerable<TaskItem> taskItems = await _taskService.GetUserTasks(queryParams);
-            IEnumerable<TaskResponse> res = _mapper.Map<IEnumerable<TaskResponse>>(taskItems);
-            return Ok(res);
+            return Ok(taskItems);
         }
 
         [HttpPost]
@@ -81,7 +76,7 @@ namespace PersonalTasks.Tasks.Controller
             taskItem.UserId = int.Parse(userId);
 
 
-            await _taskService.CreateTask(taskItem);
+            await _taskService.CreateTaskAsync(taskItem);
             return CreatedAtAction(nameof(GetTask), new { id = taskItem.Id }, taskItem);
         }
 
@@ -98,18 +93,17 @@ namespace PersonalTasks.Tasks.Controller
             }
             int parsedUserId = int.Parse(userId);
 
-            TaskItem? taskItem = await _taskService.GetUserTask(id, parsedUserId);
+            TaskItem? taskItem = await _taskService.GetTaskAsync(id, parsedUserId);
 
 
             if (taskItem == null)
             {
                 return NotFound();
             }
-            _mapper.Map(taskRequest, taskItem);
 
+            taskItem = _mapper.Map(taskRequest, taskItem);
 
-
-            await _taskService.UpdateTask(taskItem);
+            await _taskService.UpdateTaskAsync(taskItem);
             return NoContent();
         }
 
@@ -126,12 +120,12 @@ namespace PersonalTasks.Tasks.Controller
             }
             int parsedUserId = int.Parse(userId);
 
-            TaskItem? taskItem = await _taskService.GetUserTask(id, parsedUserId);
+            TaskItem? taskItem = await _taskService.GetTaskAsync(id, parsedUserId);
             if (taskItem == null)
             {
                 return NotFound();
             }
-            await _taskService.DeleteTask(taskItem);
+            await _taskService.DeleteTaskAsync(taskItem);
             return NoContent();
 
         }

@@ -8,7 +8,7 @@ services:
     container_name: personaltasks-db
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "1433:1433"
+      - "1489:1433"
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "Password1234"
@@ -27,9 +27,6 @@ services:
     depends_on:
       - taskDb
     environment:
-     - DB_HOST=taskDb
-     - DB_NAME=TasksDatabase
-     - DB_PASSWORD=Password1234 
      - DB_CONNECTION_STRING=Server=taskDb;Database=TasksDatabase;User Id=sa;Password=Password1234;TrustServerCertificate=True
     networks:
       - backend_taskApp
